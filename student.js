@@ -1,9 +1,11 @@
+const isEmail=require('validator').isEmail;
 const mongoose=require('mongoose');
 
 const schema=new mongoose.Schema({
-    enrolnment_Id:{
+    e_Id:{
         type:Number,
-        default:0
+        required:true,
+        unique:true
     },
     firstName:{
         type:String,
@@ -36,11 +38,16 @@ const schema=new mongoose.Schema({
             }
         }
     },
+    email:{
+        type:String,
+        required:true,
+        validate: [ isEmail, 'invalid email' ]
+    },
     gender:{
         type:String,
         required:true,
         validate(value){
-            let arr=["male","female"];
+            let arr=["male","female","Male","Female"];
             if(!arr.includes(value)){
                 throw new Error("invalid gender.");
             }
@@ -51,13 +58,18 @@ const schema=new mongoose.Schema({
         required:true,
         validate(value){
             if(value!='India'){
-                throw new Error("Non india student is not eligible for scholarShip.");
+                throw new Error("Non indian student is not eligible for scholarShip.");
             }
         }
     },
     qualification:{
         type:Object,
-        required:true
+        required:true,
+        validate(value){
+            if(Object.values(value)[0]<50 || Object.values(value)[1]<50){
+                throw new Error("You are not eligible.");
+            }
+        }
         
     },
     wantScholar:{
@@ -66,6 +78,15 @@ const schema=new mongoose.Schema({
     },
     discription:{
         type:String
+    },
+    chooseSubject:{
+        type:Array,
+        require:true
+
+    },
+    date:{
+        type:Date,
+        default:Date.now()
     }
 })
 
